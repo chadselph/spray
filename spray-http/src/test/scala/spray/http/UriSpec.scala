@@ -180,6 +180,7 @@ class UriSpec extends Specification {
       Path("H%C3%A4ll%C3%B6") === """Hällö""" :: Empty
       Path("/%F0%9F%92%A9") === Path / "\ud83d\udca9"
       Path("/%00%ff%00%61", Charset.forName("UTF-16")) === Path / "ÿa"
+      Path("/%00%61%00%62%00%63", Charset.forName("UTF-16")) === Path / "abc"
       Path("/%2F%5C") === Path / """/\"""
       Path("/:foo:/") === Path / ":foo:" / ""
       Path("%2520").head === "%20"

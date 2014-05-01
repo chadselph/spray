@@ -688,20 +688,14 @@ object Uri {
         val bytesCount = (lastPercentSignIndexPlus3 - ix) / 3
         val bytes = new Array[Byte](bytesCount)
 
-        @tailrec def decodeBytes(i: Int = 0, oredBytes: Int = 0): Int =
+        @tailrec def decodeBytes(i: Int = 0): String =
           if (i < bytesCount) {
             val byte = intValueOfHexWord(ix + 3 * i + 1)
             bytes(i) = byte.toByte
-            decodeBytes(i + 1, oredBytes | byte)
-          } else oredBytes
+            decodeBytes(i + 1)
+          } else new String(bytes, charset)
 
-        if ((decodeBytes() >> 7) != 0) { // if non-ASCII chars are present we need to involve the charset for decoding
-          sb.append(new String(bytes, charset))
-        } else {
-          @tailrec def appendBytes(i: Int = 0): Unit =
-            if (i < bytesCount) { sb.append(bytes(i).toChar); appendBytes(i + 1) }
-          appendBytes()
-        }
+        sb.append(decodeBytes())
         decode(string, charset, lastPercentSignIndexPlus3)(sb)
 
       case x ⇒ decode(string, charset, ix + 1)(sb.append(x))
