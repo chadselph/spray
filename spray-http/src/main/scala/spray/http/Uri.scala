@@ -651,13 +651,14 @@ object Uri {
     @tailrec def rec(ix: Int = 0): r.type = {
       def appendEncoded(byte: Byte): Unit = r ~~ '%' ~~ hexDigit(byte >>> 4) ~~ hexDigit(byte)
       if (ix < string.length) {
-        string.charAt(ix) match {
-          case c if is(c, keep)     ⇒ r ~~ c
+        val codePoint = string.codePointAt(ix)
+        codePoint match {
+          case c if is(c, keep)     ⇒ r ~~ c.toChar
           case ' ' if replaceSpaces ⇒ r ~~ '+'
           case c if c <= 127        ⇒ appendEncoded(c.toByte)
-          case c                    ⇒ c.toString.getBytes(charset).foreach(appendEncoded)
+          case c                    ⇒ new String(Array(c), 0, 1).getBytes(charset).foreach(appendEncoded)
         }
-        rec(ix + 1)
+        rec(ix + Character.charCount(codePoint))
       } else r
     }
     rec()
